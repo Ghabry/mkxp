@@ -28,57 +28,62 @@
 
 struct Config
 {
-	int rgssVersion;
+	int rgssVersion = 0;
 
-	bool debugMode;
-	bool printFPS;
+	bool debugMode = false;
+	bool printFPS = false;
 
-	bool winResizable;
-	bool fullscreen;
-	bool fixedAspectRatio;
-	bool smoothScaling;
-	bool vsync;
+	bool winResizable = false;
+	bool fullscreen = false;
+	bool fixedAspectRatio = true;
+	bool smoothScaling = true;
+	bool vsync = false;
 
+<<<<<<< HEAD
 	int defScreenW;
 	int defScreenH;
 	std::string windowTitle;
+=======
+	int defScreenW = 0;
+	int defScreenH = 0;
+>>>>>>> WIP: Emscripten support
 
-	int fixedFramerate;
-	bool frameSkip;
-	bool syncToRefreshrate;
+	int fixedFramerate = 0;
+	bool frameSkip =true;
+	bool syncToRefreshrate = false;
 
-	bool solidFonts;
+	bool solidFonts = false;
 
-	bool subImageFix;
-	bool enableBlitting;
-	int maxTextureSize;
+	bool subImageFix = false;
+	bool enableBlitting = true;
+	int maxTextureSize = 0;
 
-	std::string gameFolder;
-	bool anyAltToggleFS;
-	bool enableReset;
-	bool allowSymlinks;
-	bool pathCache;
+	std::string gameFolder = ".";
+	bool anyAltToggleFS = false;
+	bool enableReset = true;
+	bool allowSymlinks = false;
+	bool pathCache=true;
 
 	std::string dataPathOrg;
 	std::string dataPathApp;
 
 	std::string iconPath;
-	std::string execName;
+	std::string execName = "Game";
 	std::string titleLanguage;
 
 	struct
 	{
 		std::string soundFont;
-		bool chorus;
-		bool reverb;
+		bool chorus = false;
+		bool reverb = false;
 	} midi;
 
 	struct
 	{
-		int sourceCount;
+		int sourceCount = 6;
 	} SE;
 
-	bool useScriptNames;
+	bool useScriptNames = false;
 
 	std::string customScript;
 	std::set<std::string> preloadScripts;

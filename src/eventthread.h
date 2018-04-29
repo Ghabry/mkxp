@@ -35,7 +35,7 @@
 #include <string>
 
 #include <stdint.h>
-
+class SettingsMenu;
 struct RGSSThreadData;
 typedef struct ALCdevice_struct ALCdevice;
 struct SDL_Window;
@@ -123,6 +123,35 @@ private:
 		double acc;
 		uint32_t accDiv;
 	} fps;
+
+	SDL_Window *win;
+	int toggleFSMod;
+
+	bool displayingFPS = false;
+
+	bool cursorInWindow = false;
+	/* Will be updated eventually */
+	SDL_Rect gameScreen = { 0, 0, 0, 0 };
+
+	/* SDL doesn't send an initial FOCUS_GAINED event */
+	bool windowFocused = true;
+
+	bool terminate = false;
+
+	SDL_Joystick *js = 0;
+
+	char buffer[128];
+
+	char pendingTitle[128];
+	bool havePendingTitle = false;
+
+	bool resetting = false;
+
+	int winW, winH;
+	int i;
+
+	SettingsMenu *sMenu = 0;
+
 };
 
 /* Used to asynchronously inform the RGSS thread

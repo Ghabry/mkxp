@@ -100,7 +100,9 @@ bool EventThread::allocUserEvents()
 
 	return true;
 }
-
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 EventThread::EventThread()
     : fullscreen(false),
       showCursor(false)
@@ -108,64 +110,43 @@ EventThread::EventThread()
 
 void EventThread::process(RGSSThreadData &rtData)
 {
+		SDL_Event event;
+	UnidirMessage<Vec2i> windowSizeMsg;
+
+	static bool once = true;
+	if (once) {
 	SDL_Event event;
 	SDL_Window *win = rtData.window;
 	UnidirMessage<Vec2i> &windowSizeMsg = rtData.windowSizeMsg;
 
 	initALCFunctions(rtData.alcDev);
 
-	// XXX this function breaks input focus on OSX
-#ifndef __MACOSX__
-	SDL_SetEventFilter(eventFilter, &rtData);
-#endif
 
 	fullscreen = rtData.config.fullscreen;
-	int toggleFSMod = rtData.config.anyAltToggleFS ? KMOD_ALT : KMOD_LALT;
+	toggleFSMod = rtData.config.anyAltToggleFS ? KMOD_ALT : KMOD_LALT;
 
 	fps.lastFrame = SDL_GetPerformanceCounter();
 	fps.displayCounter = 0;
 	fps.acc = 0;
 	fps.accDiv = 0;
 
-	if (rtData.config.printFPS)
-		fps.sendUpdates.set();
-
-	bool displayingFPS = false;
-
-	bool cursorInWindow = false;
-	/* Will be updated eventually */
-	SDL_Rect gameScreen = { 0, 0, 0, 0 };
-
-	/* SDL doesn't send an initial FOCUS_GAINED event */
-	bool windowFocused = true;
-
-	bool terminate = false;
-
-	SDL_Joystick *js = 0;
 	if (SDL_NumJoysticks() > 0)
 		js = SDL_JoystickOpen(0);
 
-	char buffer[128];
-
-	char pendingTitle[128];
-	bool havePendingTitle = false;
-
-	bool resetting = false;
-
-	int winW, winH;
-	int i;
-
 	SDL_GetWindowSize(win, &winW, &winH);
 
-	SettingsMenu *sMenu = 0;
-
-	while (true)
+	once = false;
+	}
+	while (SDL_PollEvent(&event))
 	{
-		if (!SDL_WaitEvent(&event))
-		{
-			Debug() << "EventThread: Event error";
-			break;
-		}
+#ifdef __EMSCRIPTEN__
+		emscripten_sleep(10);
+#endif
+//		if (!SDL_WaitEvent(&event))
+//		{
+//			Debug() << "EventThread: Event error";
+//			break;
+//		}
 
 		if (sMenu && sMenu->onEvent(event))
 		{
@@ -460,12 +441,12 @@ void EventThread::process(RGSSThreadData &rtData)
 	}
 
 	/* Just in case */
-	rtData.syncPoint.resumeThreads();
+	//rtData.syncPoint.resumeThreads();
 
-	if (SDL_JoystickGetAttached(js))
-		SDL_JoystickClose(js);
+	//if (SDL_JoystickGetAttached(js))
+	//	SDL_JoystickClose(js);
 
-	delete sMenu;
+	//delete sMenu;
 }
 
 int EventThread::eventFilter(void *data, SDL_Event *event)

@@ -21,9 +21,9 @@
 
 #include "config.h"
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
+//#include <boost/program_options/options_description.hpp>
+//#include <boost/program_options/parsers.hpp>
+//#include <boost/program_options/variables_map.hpp>
 
 #include <SDL_filesystem.h>
 
@@ -141,8 +141,8 @@ std::set<T> setFromVec(const std::vector<T> &vec)
 	return std::set<T>(vec.begin(), vec.end());
 }
 
-typedef std::vector<std::string> StringVec;
-namespace po = boost::program_options;
+//typedef std::vector<std::string> StringVec;
+//namespace po = boost::program_options;
 
 #define CONF_FILE "mkxp.conf"
 
@@ -151,6 +151,8 @@ Config::Config()
 
 void Config::read(int argc, char *argv[])
 {
+	gameFolder = "game";
+#if 0
 #define PO_DESC_ALL \
 	PO_DESC(rgssVersion, int, 0) \
 	PO_DESC(debugMode, bool, false) \
@@ -267,6 +269,8 @@ void Config::read(int argc, char *argv[])
 
 #undef PO_DESC
 #undef PO_DESC_ALL
+#endif
+	preloadScripts.insert("win32_wrap.rb");
 
 	rgssVersion = clamp(rgssVersion, 0, 3);
 
@@ -299,6 +303,7 @@ static void setupScreenSize(Config &conf)
 
 void Config::readGameINI()
 {
+
 	if (!customScript.empty())
 	{
 		game.title = baseName(customScript);
@@ -310,10 +315,12 @@ void Config::readGameINI()
 
 		return;
 	}
+#if 0
+#endif
 
 	std::string iniFilename = execName + ".ini";
 	SDLRWStream iniFile(iniFilename.c_str(), "r");
-
+#if 0
 	if (iniFile)
 	{
 		INIConfiguration ic;
@@ -344,6 +351,9 @@ void Config::readGameINI()
 		Debug() << "FAILED to open" << iniFilename;
 	}
 
+#endif
+	game.scripts = "Data/Scripts.rxdata";
+	strReplace(game.scripts, '\\', '/');
 #ifdef INI_ENCODING
 	/* Can add more later */
 	const char *languages[] =

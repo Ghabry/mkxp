@@ -18,7 +18,7 @@
 ** You should have received a copy of the GNU General Public License
 ** along with mkxp.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <cassert>
 #include "filesystem.h"
 
 #include "rgssad.h"

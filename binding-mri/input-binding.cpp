@@ -24,12 +24,14 @@
 #include "exception.h"
 #include "binding-util.h"
 #include "util.h"
+#include "eventthread.h"
 
 RB_METHOD(inputUpdate)
 {
 	RB_UNUSED_PARAM;
 
 	shState->input().update();
+shState->eThread().process(shState->rtData());
 
 	return Qnil;
 }

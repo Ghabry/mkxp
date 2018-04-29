@@ -13,7 +13,7 @@
 #elif __WINDOWS__
 #define FLUID_LIB "fluidsynth.dll"
 #else
-#error "platform not recognized"
+//#error "platform not recognized"
 #endif
 
 struct FluidFunctions fluid;
@@ -22,6 +22,7 @@ static void *so;
 
 void initFluidFunctions()
 {
+#if 0
 #ifdef SHARED_FLUID
 
 #define FLUID_FUN(name, type) \
@@ -60,4 +61,7 @@ fail:
 	SDL_UnloadObject(so);
 	so = 0;
 #endif
+#endif
+	so = 0;
+	return;
 }

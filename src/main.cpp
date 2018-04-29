@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 		}
 
 	conf.readGameINI();
-
+	printf("%s\n", conf.gameFolder.c_str());
 	if (conf.windowTitle.empty())
 		conf.windowTitle = conf.game.title;
 
@@ -325,8 +325,9 @@ int main(int argc, char *argv[])
 	rtData.bindingUpdateMsg.post(loadBindings(conf));
 
 	/* Start RGSS thread */
-	SDL_Thread *rgssThread =
-	        SDL_CreateThread(rgssThreadFun, "rgss", &rtData);
+	//SDL_Thread *rgssThread =
+	//        SDL_CreateThread(rgssThreadFun, "rgss", &rtData);
+	::rgssThreadFun(&rtData);
 
 	/* Start event processing */
 	eventThread.process(rtData);
@@ -350,8 +351,8 @@ int main(int argc, char *argv[])
 
 	/* If RGSS thread ack'd request, wait for it to shutdown,
 	 * otherwise abandon hope and just end the process as is. */
-	if (rtData.rqTermAck)
-		SDL_WaitThread(rgssThread, 0);
+	if (rtData.rqTermAck){}
+		//SDL_WaitThread(rgssThread, 0);
 	else
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, conf.windowTitle.c_str(),
 		                         "The RGSS script seems to be stuck and mkxp will now force quit", win);

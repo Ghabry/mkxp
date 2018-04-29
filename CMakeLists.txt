@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
+set(CMAKE_CXX_STANDARD 14)
 Project(mkxp)
 
 ## Setup options ##
@@ -14,7 +15,7 @@ set(EXTERNAL_LIB_PATH "" CACHE PATH "External precompiled lib prefix")
 include(cmake/PrepUtils.cmake)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
+set(CMAKE_EXECUTABLE_SUFFIX ".html")
 IF("${CMAKE_SYSTEM}" MATCHES "Linux")
 	SET(LINUX ON)
 ENDIF()
@@ -53,6 +54,16 @@ elseif(APPLE)
 	set(LIB_PATH "lib")
 endif()
 
+set(EMTERPRETER_OPT "-O0 -s ASSERTIONS=0 -s TOTAL_MEMORY=67108864 -s ABORTING_MALLOC=0 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 --embed-file \"game\"")
+set(EMTERPRETER_OPT "${EMTERPRETER_OPT} -s EMTERPRETIFY_WHITELIST=\"['__ZN8Graphics10transitionEiPKci','__ZL18graphicsTransitioniPmm','_call_cfunc','_rb_call0','_rb_call','_rb_eval','_rb_eval_string','_eval_node','_eval','_rb_f_eval','_rb_funcall2','_rb_protect','_rb_yield_0','_loop_i','_rb_rescue2','_rb_f_loop','__ZL10evalHelperP7evalArg','__ZL10evalStringmmPi','__ZL14runRMXPScriptsR13BacktraceData','__Z13rgssThreadFunPv','_main','__ZL11inputUpdateiPmm','__ZN11EventThread7processER14RGSSThreadData','__ZL17mriBindingExecutev','__ZL14mriBindingInitv','_module_setup']\"")
+
+message(STATUS ${EMTERPRETER_OPT})
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMTERPRETER_OPT}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMTERPRETER_OPT}")
+
+message(STATUS ${CMAKE_C_FLAGS})
+
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH ${BIN_RPATH})
@@ -64,12 +75,12 @@ find_package(PkgConfig REQUIRED)
 
 if (EXTERNAL_LIB_PATH)
 	set(CMAKE_PREFIX_PATH ${EXTERNAL_LIB_PATH})
-	
+
 	if(EXISTS "${EXTERNAL_LIB_PATH}/${LIB_PATH}/pkgconfig/")
 		SET(ENV{PKG_CONFIG_PATH} "${EXTERNAL_LIB_PATH}/${LIB_PATH}/pkgconfig/")
 	endif()
 	if(APPLE)
-		set(PLATFORM_SHARED_LIBS 
+		set(PLATFORM_SHARED_LIBS
 			libSDL2.dylib libSDL2_image-2.0.0.dylib libSDL2_ttf-2.0.0.dylib libSDL_sound-1.0.1.dylib
 			libfreetype.6.dylib libsigc-2.0.0.dylib
 			CACHE STRING "List of shared libraries that need to be copied into the OS X bundle")
@@ -92,9 +103,10 @@ pkg_check_modules(SDL2_TTF      REQUIRED SDL2_ttf)
 pkg_check_modules(SDL2_IMAGE    REQUIRED SDL2_image)
 pkg_check_modules(SDL_SOUND     REQUIRED SDL_sound)
 
-find_package(Boost 1.49 COMPONENTS program_options REQUIRED)
+#find_package(Boost 1.49 COMPONENTS program_options REQUIRED)
 find_package(OpenAL REQUIRED)
-find_package(ZLIB REQUIRED)
+pkg_check_modules(ZLIB REQUIRED zlib)
+#find_package(ZLIB REQUIRED)
 
 ## Setup main source ##
 
@@ -395,7 +407,7 @@ link_directories(
 	${PIXMAN_LIBRARY_DIRS}
 	${PHYSFS_LIBRARY_DIRS}
 	${SDL2_LIBRARY_DIRS} # Blindly assume other SDL bits are in same directory
-	${Boost_LIBRARY_DIR}
+#	${Boost_LIBRARY_DIR}
 	${MRI_LIBDIR}
 )
 
@@ -417,11 +429,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${PIXMAN_INCLUDE_DIRS}
 	${PHYSFS_INCLUDE_DIRS}
 	${SDL2_INCLUDE_DIRS} # Blindly assume other SDL bits are in same directory
-	${Boost_INCLUDE_DIR}
+#	${Boost_INCLUDE_DIR}
 	${MRI_INCLUDE_DIRS}
 	${VORBISFILE_INCLUDE_DIRS}
 	${FLUID_INCLUDE_DIRS}
 	${OPENAL_INCLUDE_DIR}
+	${SDL_SOUND_INCLUDE_DIRS}
+	${FREETYPE_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -432,14 +446,21 @@ target_link_libraries(${PROJECT_NAME}
 	${SDL_SOUND_LIBRARIES}
 	${PHYSFS_LIBRARIES}
 	${PIXMAN_LIBRARIES}
-	${Boost_LIBRARIES}
+#	${Boost_LIBRARIES}
 	${MRI_LIBRARIES}
 	${VORBISFILE_LIBRARIES}
 	${FLUID_LIBRARIES}
 	${OPENAL_LIBRARY}
 	${ZLIB_LIBRARY}
-
 	${PLATFORM_LIBRARIES}
+	"libruby-static.a"
+	"libfreetype.a"
+	"libz.a"
+	"libpng.a"
+	"libogg.a"
+	"libvorbis.a"
+	"libvorbisfile.a"
+	"libjpeg.a"
 )
 
 PostBuildMacBundle(${PROJECT_NAME} "" "${PLATFORM_COPY_LIBS}")
