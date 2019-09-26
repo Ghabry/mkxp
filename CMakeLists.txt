@@ -54,8 +54,12 @@ elseif(APPLE)
 	set(LIB_PATH "lib")
 endif()
 
-set(EMTERPRETER_OPT "-O0 -s ASSERTIONS=0 -s TOTAL_MEMORY=67108864 -s ABORTING_MALLOC=0 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 --embed-file \"game\"")
-set(EMTERPRETER_OPT "${EMTERPRETER_OPT} -s EMTERPRETIFY_WHITELIST=\"['__ZN8Graphics10transitionEiPKci','__ZL18graphicsTransitioniPmm','_call_cfunc','_rb_call0','_rb_call','_rb_eval','_rb_eval_string','_eval_node','_eval','_rb_f_eval','_rb_funcall2','_rb_protect','_rb_yield_0','_loop_i','_rb_rescue2','_rb_f_loop','__ZL10evalHelperP7evalArg','__ZL10evalStringmmPi','__ZL14runRMXPScriptsR13BacktraceData','__Z13rgssThreadFunPv','_main','__ZL11inputUpdateiPmm','__ZN11EventThread7processER14RGSSThreadData','__ZL17mriBindingExecutev','__ZL14mriBindingInitv','_module_setup']\"")
+#set(EMTERPRETER_OPT "-s ASSERTIONS=0 -s TOTAL_MEMORY=67108864 -s ABORTING_MALLOC=0 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 --preload-file \"game\"")
+#set(EMTERPRETER_OPT "${EMTERPRETER_OPT} -s EMTERPRETIFY_WHITELIST=\"['__ZN8Graphics10transitionEiPKci','__ZL18graphicsTransitioniPmm','_call_cfunc','_rb_call0','_rb_call','_rb_eval','_rb_eval_string','_eval_node','_eval','_rb_f_eval','_rb_funcall2','_rb_protect','_rb_yield_0','_loop_i','_rb_rescue2','_rb_f_loop','__ZL10evalHelperP7evalArg','__ZL10evalStringmmPi','__ZL14runRMXPScriptsR13BacktraceData','__Z13rgssThreadFunPv','_main','__ZL11inputUpdateiPmm','__ZN11EventThread7processER14RGSSThreadData','__ZL17mriBindingExecutev','__ZL14mriBindingInitv','_module_setup', '_main']\"")
+#set(EMTERPRETER_OPT "${EMTERPRETER_OPT} -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['Pointer_stringify']\" -s DISABLE_EXCEPTION_CATCHING=2")
+#set(EMTERPRETER_OPT "${EMTERPRETER_OPT} -s ALIASING_FUNCTION_POINTERS=0")
+
+set(EMTERPRETER_OPT "-s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s ABORTING_MALLOC=0 -s NO_EXIT_RUNTIME=1 -s ASYNCIFY -s ERROR_ON_UNDEFINED_SYMBOLS=0 --embed-file \"game\"")
 
 message(STATUS ${EMTERPRETER_OPT})
 
@@ -104,7 +108,8 @@ pkg_check_modules(SDL2_IMAGE    REQUIRED SDL2_image)
 pkg_check_modules(SDL_SOUND     REQUIRED SDL_sound)
 
 #find_package(Boost 1.49 COMPONENTS program_options REQUIRED)
-find_package(OpenAL REQUIRED)
+#find_package(OpenAL REQUIRED)
+pkg_check_modules(OpenAL REQUIRED openal)
 pkg_check_modules(ZLIB REQUIRED zlib)
 #find_package(ZLIB REQUIRED)
 
@@ -307,7 +312,7 @@ source_group("Embedded Source" FILES ${EMBEDDED_INPUT} ${EMBEDDED_SOURCE})
 
 if (BINDING STREQUAL "MRI")
 	set(MRIVERSION "2.1" CACHE STRING "Version of MRI to link with")
-	pkg_check_modules(MRI REQUIRED ruby-${MRIVERSION})
+	#pkg_check_modules(MRI REQUIRED ruby-${MRIVERSION})
 	list(APPEND DEFINES
 		BINDING_MRI
 	)
@@ -433,9 +438,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${MRI_INCLUDE_DIRS}
 	${VORBISFILE_INCLUDE_DIRS}
 	${FLUID_INCLUDE_DIRS}
-	${OPENAL_INCLUDE_DIR}
+	${OpenAL_INCLUDE_DIRS}
 	${SDL_SOUND_INCLUDE_DIRS}
 	${FREETYPE_INCLUDE_DIRS}
+	"/home/gabriel/Programmierung/mkxp_js/deps_js/install/lib/ruby/1.8/x86_64-linux"
+	"/home/gabriel/Programmierung/mkxp_js/deps_js/install/lib/ruby/1.8"
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -450,7 +457,7 @@ target_link_libraries(${PROJECT_NAME}
 	${MRI_LIBRARIES}
 	${VORBISFILE_LIBRARIES}
 	${FLUID_LIBRARIES}
-	${OPENAL_LIBRARY}
+	${OpenAL_LIBRARY}
 	${ZLIB_LIBRARY}
 	${PLATFORM_LIBRARIES}
 	"libruby-static.a"

@@ -444,7 +444,7 @@ private:
 		SDL_Delay(ticks / tickFreqMS);
 #endif
 #endif
-#ifdef __EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		emscripten_sleep(ticks /tickFreqMS);
 #endif
 	}

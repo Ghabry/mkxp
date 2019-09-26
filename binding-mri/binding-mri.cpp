@@ -42,6 +42,10 @@
 
 #include <SDL_filesystem.h>
 
+extern "C" {
+	extern char** environ;
+};
+
 extern const char module_rpg1[];
 extern const char module_rpg2[];
 extern const char module_rpg3[];
@@ -156,7 +160,7 @@ static void mriBindingInit()
 	if (rgssVer == 1)
 		rb_gv_set("DEBUG", debug);
 	else if (rgssVer >= 2)
-		rb_gv_set("TEST", debug);
+		rb_gv_set("TEST", (VALUE)environ);
 
 	rb_gv_set("BTEST", rb_bool_new(shState->config().editor.battleTest));
 }
@@ -164,7 +168,7 @@ static void mriBindingInit()
 static void
 showMsg(const std::string &msg)
 {
-	printf("Show msg %s\n", msg.c_str()); 
+	printf("Show msg %s\n", msg.c_str());
         return;
 //	shState->eThread().showMessageBox(msg.c_str());
 }
@@ -277,9 +281,9 @@ RB_METHOD(mriRgssMain)
 	{
 		VALUE exc = Qnil;
 
-		rb_rescue2((VALUE(*)(ANYARGS)) rgssMainCb, rb_block_proc(),
+		/*rb_rescue2((VALUE(*)(ANYARGS)) rgssMainCb, rb_block_proc(),
 		           (VALUE(*)(ANYARGS)) rgssMainRescue, (VALUE) &exc,
-		           rb_eException, (VALUE) 0);
+		           rb_eException, (VALUE) 0);*/
 
 		if (NIL_P(exc))
 			break;
@@ -426,7 +430,7 @@ static void runRMXPScripts(BacktraceData &btData)
 
 	long scriptCount = RARRAY_LEN(scriptArray);
 
-	std::string decodeBuffer;
+	std::vector<unsigned char> decodeBuffer;
 	decodeBuffer.resize(0x1000);
 
 	for (long i = 0; i < scriptCount; ++i)
@@ -445,11 +449,11 @@ static void runRMXPScripts(BacktraceData &btData)
 		while (true)
 		{
 			unsigned char *bufferPtr =
-			        reinterpret_cast<unsigned char*>(const_cast<char*>(decodeBuffer.c_str()));
+			        reinterpret_cast<unsigned char*>(decodeBuffer.data());
 			const unsigned char *sourcePtr =
 			        reinterpret_cast<const unsigned char*>(RSTRING_PTR(scriptString));
 
-			bufferLen = decodeBuffer.length();
+			bufferLen = decodeBuffer.size();
 
 			result = uncompress(bufferPtr, &bufferLen,
 			                    sourcePtr, RSTRING_LEN(scriptString));
@@ -473,7 +477,7 @@ static void runRMXPScripts(BacktraceData &btData)
 			break;
 		}
 
-		rb_ary_store(script, 3, rb_str_new_cstr(decodeBuffer.c_str()));
+		rb_ary_store(script, 3, rb_str_new_cstr(reinterpret_cast<const char*>(decodeBuffer.data())));
 	}
 
 	/* Execute preloaded scripts */
@@ -488,8 +492,8 @@ static void runRMXPScripts(BacktraceData &btData)
 	while (true)
 	{
 #ifdef __EMSCRIPTEN
-		emscripten_sleep(10);
-#endif	
+		emscripten_sleep(1);
+#endif
 
 		for (long i = 0; i < scriptCount; ++i)
 		{

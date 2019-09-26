@@ -39,14 +39,9 @@ struct Config
 	bool smoothScaling = true;
 	bool vsync = false;
 
-<<<<<<< HEAD
-	int defScreenW;
-	int defScreenH;
 	std::string windowTitle;
-=======
 	int defScreenW = 0;
 	int defScreenH = 0;
->>>>>>> WIP: Emscripten support
 
 	int fixedFramerate = 0;
 	bool frameSkip =true;

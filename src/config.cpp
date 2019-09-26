@@ -270,7 +270,7 @@ void Config::read(int argc, char *argv[])
 #undef PO_DESC
 #undef PO_DESC_ALL
 #endif
-	preloadScripts.insert("win32_wrap.rb");
+	//preloadScripts.insert("win32_wrap.rb");
 
 	rgssVersion = clamp(rgssVersion, 0, 3);
 

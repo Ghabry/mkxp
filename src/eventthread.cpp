@@ -140,7 +140,7 @@ void EventThread::process(RGSSThreadData &rtData)
 	while (SDL_PollEvent(&event))
 	{
 #ifdef __EMSCRIPTEN__
-		emscripten_sleep(10);
+		emscripten_sleep(1);
 #endif
 //		if (!SDL_WaitEvent(&event))
 //		{

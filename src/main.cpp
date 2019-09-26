@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 		}
 
 	conf.readGameINI();
-	printf("%s\n", conf.gameFolder.c_str());
+	printf("GAME: %s\n", conf.gameFolder.c_str());
 	if (conf.windowTitle.empty())
 		conf.windowTitle = conf.game.title;
 
